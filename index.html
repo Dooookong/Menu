@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘 뭐 먹지? - 저녁 메뉴 추천</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+    <style>
+        /* [스타일(CSS) 영역] 디자인은 여기서 수정하세요 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Jua', sans-serif;
+        }
+
+        body {
+            background-color: #ffecd2; /* 배경색 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #ff6f61;
+        }
+
+        header p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            transition: transform 0.2s;
+        }
+
+        #result-box {
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        #food-result {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background-color: #eee;
+            border-radius: 15px;
+            font-size: 1rem;
+            color: #777;
+        }
+
+        button {
+            background-color: #ff6f61; /* 버튼 색 */
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 111, 97, 0.4);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #ff4b3a;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ 오늘 저녁 뭐 먹지?</h1>
+            <p>고민은 배달만 늦출 뿐!</p>
+        </header>
+
+        <div class="card">
+            <div id="result-box">
+                <div id="food-result">?</div>
+                <div id="food-type" class="type-badge">메뉴를 골라주세요</div>
+            </div>
+        </div>
+
+        <button id="recommend-btn" onclick="recommendFood()">메뉴 추천받기 GO!</button>
+
+        <footer>
+            <p>Made by Dookong</p>
+        </footer>
+    </div>
+
+    <script>
+        /* [스크립트(JS) 영역] 기능은 여기서 수정하세요 */
+        
+        // 여기에 원하는 메뉴를 더 추가하거나 빼면 됩니다.
+        const menuList = [
+            { name: "삼겹살", type: "한식" },
+            { name: "치킨", type: "야식" },
+            { name: "떡볶이", type: "분식" },
+            { name: "마라탕", type: "중식" },
+            { name: "초밥", type: "일식" },
+            { name: "피자", type: "양식" },
+            { name: "김치찌개", type: "한식" },
+            { name: "햄버거", type: "패스트푸드" },
+            { name: "족발/보쌈", type: "야식" },
+            { name: "파스타", type: "양식" },
+            { name: "짜장면", type: "중식" },
+            { name: "쌀국수", type: "아시안" },
+            { name: "돈까스", type: "일식" },
+            { name: "된장찌개", type: "한식" },
+            { name: "라면", type: "분식" },
+            { name: "제육볶음", type: "한식" },
+            { name: "샌드위치", type: "간편식" },
+            { name: "곱창/대창", type: "야식" }
+        ];
+
+        const resultText = document.getElementById('food-result');
+        const typeText = document.getElementById('food-type');
+        const btn = document.getElementById('recommend-btn');
+
+        let isAnimating = false;
+
+        function recommendFood() {
+            if (isAnimating) return; // 중복 클릭 방지
+            
+            isAnimating = true;
+            btn.disabled = true;
+            btn.innerText = "메뉴 고르는 중...";
+            
+            let count = 0;
+            const maxCount = 20; // 룰렛 돌아가는 횟수
+            
+            // 0.1초마다 메뉴가 바뀌는 애니메이션 효과
+            const interval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * menuList.length);
+                const selected = menuList[randomIndex];
+                
+                resultText.innerText = selected.name;
+                typeText.innerText = selected.type;
+                typeText.style.backgroundColor = "#eee";
+                typeText.style.color = "#777";
+                
+                count++;
+                
+                // 애니메이션 끝
+                if (count > maxCount) {
+                    clearInterval(interval);
+                    showFinalResult();
+                }
+            }, 80);
+        }
+
+        function showFinalResult() {
+            // 최종 결과 선택
+            const finalIndex = Math.floor(Math.random() * menuList.length);
+            const finalMenu = menuList[finalIndex];
+            
+            resultText.innerText = finalMenu.name;
+            typeText.innerText = `#${finalMenu.type}`;
+            
+            // 결과 강조 스타일
+            typeText.style.backgroundColor = "#ffecd2";
+            typeText.style.color = "#ff6f61";
+            typeText.style.fontWeight = "bold";
+
+            isAnimating = false;
+            btn.disabled = false;
+            btn.innerText = "다시 추천받기";
+        }
+    </script>
+</body>
+</html>
